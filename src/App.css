@@ -1,21 +1,9 @@
-/*.dashboard{
-  width: 70%;
-}
-
-.dashbaord-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}*/
-
-.dashboard {
+.content{
   display: flex;
   gap: 20px;
 
 }
-
-
-.dashbaord--content{
+.content--page{
   background: #fff;
   flex: 1;
   border-radius: 20px;

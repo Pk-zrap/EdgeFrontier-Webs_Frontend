@@ -1,21 +1,18 @@
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Sidebar from "./components/Sidbar01";
+import Sidbar from "./components/Sidbar";
 import Dashboard from "./page/Dashboard";
-
-import './App.css';
+import "./App.css";
 
 const App = () => {
   return (
-    <div className="dashboard">
+    <div className="content">
       <BrowserRouter>
-        <Sidebar />
-        <div className="dashboard--content">
-          <Routes>
-          <Route path="Dashboard" element={<Dashboard />} />
-
-
-          </Routes>
+      
+        <Sidbar />
+        <div className="content--page">
+        <Dashboard />
         </div>
       </BrowserRouter>
     </div>

@@ -1,12 +1,11 @@
 import React from 'react'
-import ContentHead from"../components/ContentHeader"
-import CS from "../components/Card"
-
+import ContentHeader from "../components/ContentHeader"
+import Card from "../components/Card"
+import Profile from '../components/Profile'
 const Dashboard = () => {
   return (
-    <div >
-      <ContentHead />
-      <CS />
+    <div>
+        <ContentHeader />
 
 
     </div>

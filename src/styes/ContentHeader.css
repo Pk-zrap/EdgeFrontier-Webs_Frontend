@@ -1,0 +1,48 @@
+.content--header{
+  position: flex;
+  align-items: center;
+  justify-content: space-between;  
+}
+
+.header--activity{
+  display: flex;
+  align-items: center; 
+  gap: 25px; 
+}
+.search-box {
+    background: #dde6ed;
+    padding: 5px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+}
+  
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 5px;
+  outline:  none;
+}
+  
+/* Notification Icon */
+.notify {
+    margin-left: 820px;
+    background: #4E82EB;
+    padding: 5px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  
+.notify .icon {
+    color: #ffffff;
+    font-size: 20px;
+}
+  
+.notify .icon:hover {
+    transform: scale(1.3);
+    cursor: pointer;
+  }
+  

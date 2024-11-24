@@ -1,5 +1,5 @@
 import React from "react";
-import "../styes/Profile.css";
+import "../styles/Profile.css";
 
 import proF from "../assets/profile.png";
 import factory from "../assets/factory.png"

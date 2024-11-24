@@ -96,6 +96,8 @@
   background: #fff;
   color: #000;
   cursor: pointer;
+  font-weight: bold; 
+
 }
 .menu-logout .item.active {
   width: 100px;
@@ -131,60 +133,6 @@
 }
 
 /* For screen widths <= 768px (smaller tablets) */
-@media (max-width: 768px) 
-{
-  .Sidbar {
-    width: 70px; /* Sidebar width remains the same for tablets */
-    align-items: center;
-  }
-
-  .logo-img {
-    width: 50px; /* Reduce logo size for mobile */
-  }
-
-  .menu--list {
-    position: absolute;
-    top: 25%;
-    left: 21%;
-    gap: 50px;
-    display: flex;
-    flex-direction: column;
-  }
-  .menu--list .item .icon {
-    transform: scale(1.7);
-  }
-
-  .menu-logout .item .icon {
-    transform: scale(2.1);
-  }
-
-  .menu-logout {
-    position: absolute;
-    top: 80%;
-    left: 40%;
-    gap: 50px;
-    flex-direction: column;
-    display: flex;
-  }
-
-  .menu--list .item {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    font-size: 1rem;
-    border-radius: 13px;
-    transition: all 0.3s ease;
-  }
-
-  .menu--list .item:hover {
-    gap: 30px;
-    background: #fff;
-    color: #1da9ff;
-    position: relative; /* Ensure the item stays in the same position */
-    top: 0;
-  }
-}
-  /* For screen widths <= 768px (smaller tablets) */
   @media (max-width: 768px) {
       .Sidbar {
           width: 70px; /* Sidebar width remains the same for tablets */

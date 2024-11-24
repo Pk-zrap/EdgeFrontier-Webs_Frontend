@@ -7,7 +7,13 @@ const ContentHeader = () => {
     <div className="content--header">
       <div className="header--activity">
         <div className="search-box">
-          <input type="text" placeholder="Search anything here..." />
+          <input type="text" placeholder="--/" />
+        </div>
+        <div className="styled-wrapper">
+          <label className="switch">
+            <input type="checkbox" />
+            <span className="slider" />
+          </label>
         </div>
 
         <div className="notify">

@@ -14,21 +14,22 @@
     gap: 20px; 
   }
 
-.search-box{
-      background: #dde6ed;
-      padding: 5px 20px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
+/* Message Box */
+.message-box {
+  background: #dde6ed; 
+  padding: 15px; 
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  color: #707070;
+  font-size: 14px;
+  width: 100%; /* Adjust width to your preference */
+  max-width: 500px; /* Optional to limit the width */
+  white-space: nowrap; /* Prevent wrapping of text */
+  overflow: hidden; /* Hide overflow if text is too long */
+  text-overflow: ellipsis; /* Show "..." if text overflows */
 }
-    
-  .search-box input {
-    border: none;
-    outline: none;
-    background: transparent;
-    padding: 5px;
-  }
-    
+
   /* Notification Icon */
   .notify {
       margin-left: 770px;

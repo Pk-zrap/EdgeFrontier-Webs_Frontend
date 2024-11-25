@@ -166,7 +166,7 @@ function Card() {
         </div>
 
         {/* Block 4 */}
-        <div className="absolute top-50 right-[270px] bg-gray-200 rounded-[30px] p-6 w-[370px] h-[419px] shadow-xl">
+        <div className="absolute top-50  bg-gray-200 rounded-[30px] p-6 w-[370px] h-[419px] shadow-xl left-[1050px]">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold  text-[#707178]">PRESSURE</h2>
             <label className="relative inline-flex items-center cursor-pointer">

@@ -29,12 +29,12 @@
     border-radius: 50%;
     inset: 0;
     background: 
-      radial-gradient(farthest-side, #005EB6 98%, #0000) top/var(--b) var(--b) no-repeat,
+      radial-gradient(farthest-side, #0a66bc 98%, #0000) top/var(--b) var(--b) no-repeat,
       conic-gradient(
         from 0deg, 
         #005EB6 0%, 
-        #208883 calc(var(--p) * 0.3%), 
-        #56B4A9 calc(var(--p) * 0.6%), 
+        #208883 calc(var(--p) * 0.5%), 
+        #56B4A9 calc(var(--p) * 0.7%), 
         #A2D9CE calc(var(--p) * 1%), 
         #0000 0
       );

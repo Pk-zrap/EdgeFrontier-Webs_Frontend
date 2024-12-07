@@ -1,7 +1,5 @@
-// DataHost.jsx
-const socket = new WebSocket("wss://server-test-v1-1.onrender.com/demo");
+import { useState } from "react";
 
-// Declare variables to store data from the server
 export const dataStore = {
   CO2: null,
   HUMID: null,
@@ -12,42 +10,144 @@ export const dataStore = {
   Event: null,
   HardwareID: null,
   TimeStamp: null,
+  lastReceivedTime: null,
+  speed: null,
+
+  Prediction: {
+    Cold: null,
+    Warm: null,
+    Hot: null,
+    Dry: null,
+    Wet: null,
+    Normal: null,
+    Unknown: null,
+  },
 };
 
-// Listener for receiving messages from the WebSocket server
-socket.onmessage = (event) => {
-  try {
-    if (event.data) {
-      const parsedData = JSON.parse(event.data); // Parse the incoming JSON data
-      console.log(parsedData); // Log received data
+const DataHost = () => {
+  const [serverUrl, setServerUrl] = useState(""); // เก็บค่าที่ผู้ใช้ป้อน
+  const [connectionStatus, setConnectionStatus] = useState(""); // แสดงสถานะการเชื่อมต่อ
+  const [socket, setSocket] = useState(null); // เก็บ WebSocket instance
 
-      // Update dataStore with new values
-      dataStore.CO2 = parsedData.Data.CO2;
-      dataStore.HUMID = parsedData.Data.HUMID;
-      dataStore.PRESSURE = parsedData.Data.PRESSURE;
-      dataStore.RA = parsedData.Data.RA;
-      dataStore.TEMP = parsedData.Data.TEMP;
-      dataStore.VOC = parsedData.Data.VOC;
-      dataStore.Event = parsedData.Event;
-      dataStore.HardwareID = parsedData.HardwareID;
-      dataStore.TimeStamp = parsedData.TimeStamp;
+  const handleConnect = () => {
+    if (socket) {
+      socket.close(); // ปิดการเชื่อมต่อเก่าหากมี
     }
-  } catch (err) {
-    console.error("Error parsing WebSocket message:", err);
-  }
+
+    const newSocket = new WebSocket(serverUrl);
+
+    newSocket.onopen = () => {
+      setConnectionStatus("Connected");
+      console.info("WebSocket connected");
+    };
+
+    newSocket.onerror = (error) => {
+      setConnectionStatus("Connection failed");
+      console.error("WebSocket error:", error);
+    };
+
+    newSocket.onclose = () => {
+      setConnectionStatus("Connection closed");
+      console.warn("WebSocket connection closed");
+    };
+
+    newSocket.onmessage = (event) => {
+      try {
+        if (event.data) {
+          const parsedData = JSON.parse(event.data);
+          const currentTime = Date.now();
+
+          if (dataStore.lastReceivedTime) {
+            const timeDiff = currentTime - dataStore.lastReceivedTime;
+            dataStore.speed = 1000 / timeDiff;
+          }
+
+          dataStore.CO2 = parseFloat(parsedData.Data.CO2).toFixed(2);
+          dataStore.HUMID = parseFloat(parsedData.Data.HUMID).toFixed(2);
+          dataStore.PRESSURE = parseFloat(parsedData.Data.PRESSURE).toFixed(2);
+          dataStore.RA = parseFloat(parsedData.Data.RA).toFixed(2);
+          dataStore.TEMP = parseFloat(parsedData.Data.TEMP).toFixed(2);
+          dataStore.VOC = parseFloat(parsedData.Data.VOC).toFixed(2);
+          dataStore.Event = parsedData.Event;
+
+          dataStore.Prediction.Cold = parsedData.Prediction?.Cold ?? "N/A";
+          dataStore.Prediction.Warm = parsedData.Prediction?.Warm ?? "N/A";
+          dataStore.Prediction.Hot = parsedData.Prediction?.Hot ?? "N/A";
+          dataStore.Prediction.Dry = parsedData.Prediction?.Dry ?? "N/A";
+          dataStore.Prediction.Wet = parsedData.Prediction?.Wet ?? "N/A";
+          dataStore.Prediction.Normal = parsedData.Prediction?.Normal ?? "N/A";
+          dataStore.Prediction.Unknown =
+            parsedData.Prediction?.Unknown ?? "N/A";
+
+          dataStore.lastReceivedTime = currentTime;
+        }
+      } catch (err) {
+        console.error("Error parsing WebSocket message:", err);
+      }
+    };
+
+    setSocket(newSocket); // เก็บ instance ใหม่
+  };
+
+  return (
+    <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      margin: "15px",
+      fontFamily: "Arial, sans-serif",
+    }}
+    >
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Enter server URL"
+          value={serverUrl}
+          onChange={(e) => setServerUrl(e.target.value)}
+          style={{
+            width: "300px",
+            padding: "10px",
+            fontSize: "16px",
+            border: `2px solid ${
+              connectionStatus === "Connected"
+                ? "green"
+                : connectionStatus === "Connection failed"
+                ? "red"
+                : "#ccc"
+            }`,
+            borderRadius: "10px",
+            transition: "border-color 0.3s",
+          }}
+        />
+        <button
+          onClick={handleConnect}
+          style={{
+            marginLeft: "10px",
+            padding: "10px 20px",
+            fontSize: "16px",
+            cursor: "pointer",
+            backgroundColor: "#4A90E2",
+            color: "#fff",
+            border: "none",
+            borderRadius: "10px",
+            transition: "background-color 0.3s",
+          }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "#357ABD")}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = "#4A90E2")}
+        >
+          Connect
+        </button>
+      
+      </div>
+      <div className="styled-wrapper mb-5 p-2">
+      <label className="switch">
+        <input type="checkbox" />
+        <span className="slider" />
+      </label>
+    </div>
+    </div>
+  );
 };
 
-// Other WebSocket events
-socket.onopen = () => {
-  console.log("WebSocket is connected");
-};
-
-socket.onerror = (error) => {
-  console.error("WebSocket Error:", error);
-};
-
-socket.onclose = () => {
-  console.log("WebSocket connection closed");
-};
-
-export default socket;
+export default DataHost;

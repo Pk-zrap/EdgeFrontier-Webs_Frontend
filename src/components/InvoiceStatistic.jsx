@@ -1,32 +1,84 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { LuSettings2 } from "react-icons/lu";
 
+// ดึงข้อมูลจาก dataStore
+import { dataStore } from "../page/DataHost";
+
 const InvoiceStatistic = () => {
-  const data = [
-    { label: "CO2", value: 718, color: "#ef4444" },
-    { label: "VOC", value: 531, color: "#3b82f6" },
-    { label: "RADON", value: 868, color: "#10b981" },
-    { label: "PRESSURE", value: 344, color: "#fbbf24" },
-    { label: "HUM", value: 1145, color: "#a855f7" },
-    { label: "TEMP", value: 1145, color: "#a855f7" },
-  ];
+  // State สำหรับข้อมูลที่แสดง
+  const [data, setData] = useState([]);
 
-  // Total value of all data points
-  const total = data.reduce((sum, item) => sum + item.value, 0);
-
-  // State for tracking visibility of each item
+  // State สำหรับการแสดง/ซ่อนข้อมูล
   const [visibleItems, setVisibleItems] = useState({
     CO2: true,
     VOC: true,
-    RADON: true,
+    RA: true,
     PRESSURE: true,
-    HUM: true,
+    HUMID: true,
     TEMP: true,
   });
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Toggle visibility of items in the dropdown menu
+  // ดึงข้อมูลแบบเรียลไทม์จาก dataStore
+  useEffect(() => {
+    const updateData = () => {
+      const updatedData = Object.keys(dataStore)
+        .filter(
+          (key) =>
+            !["Event", "HardwareID", "TimeStamp", "Prediction"].includes(key)
+        )
+        .map((key) => ({
+          label: key.toUpperCase(),
+          value: parseFloat(dataStore[key]) || 0,
+          color: getColorByKey(key),
+        }));
+      setData(updatedData);
+    };
+
+    const interval = setInterval(updateData, 2000); // อัปเดตทุก 2 วินาที
+    return () => clearInterval(interval); // ล้าง interval เมื่อ component ถูกทำลาย
+  }, []);
+
+  // ฟังก์ชันเพื่อกำหนดสีตาม key
+  const getColorByKey = (key) => {
+    const colors = {
+      CO2: "#FF5733",
+      HUMID: "#FFF600",
+      PRESSURE: "#1E90FF",
+      RA: "#807FCF",
+      TEMP: "#FF6F00",
+      VOC: "#39D353",
+    };
+    return colors[key] || "#ccc"; // สี default
+  };
+
+  // ฟิลเตอร์ข้อมูลที่มองเห็น
+  const visibleData = data.filter((item) => visibleItems[item.label]);
+
+  // คำนวณ total และเปอร์เซ็นต์ใหม่
+  const visibleTotal = visibleData.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
+  const adjustedData = visibleData.map((item) => ({
+    ...item,
+    adjustedPercentage:
+      visibleTotal > 0 ? Math.round((item.value / visibleTotal) * 100) : 0,
+  }));
+
+  // สร้าง Gradient สำหรับ Pie Chart
+  let cumulativeValue = 0;
+  const gradientSegments = adjustedData
+    .map((item) => {
+      const startPercentage = cumulativeValue;
+      cumulativeValue += item.adjustedPercentage;
+      return `${item.color} ${startPercentage}% ${cumulativeValue}%`;
+    })
+    .join(", ");
+
+  const toggleDropdown = () => setIsDropdownOpen((prevState) => !prevState);
+
   const handleToggleItem = (label) => {
     setVisibleItems((prevState) => ({
       ...prevState,
@@ -34,51 +86,25 @@ const InvoiceStatistic = () => {
     }));
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prevState) => !prevState);
-  };
-
-  // Calculate the gradient and percentages for each visible item
-  let cumulativeValue = 0;
-  const gradientSegments = data
-    .filter((item) => visibleItems[item.label]) // Only include visible items
-    .map((item) => {
-      const startPercentage = (cumulativeValue / total) * 100;
-      cumulativeValue += item.value;
-      const endPercentage = (cumulativeValue / total) * 100;
-      return `${item.color} ${startPercentage}% ${endPercentage}%`;
-    })
-    .join(", ");
-
-  // Pie chart and percentage calculation
-  const visibleData = data.filter((item) => visibleItems[item.label]);
-
-  // Calculate percentage for center display
-  const visibleTotal = visibleData.reduce((sum, item) => sum + item.value, 0);
-  const piePercentage = total > 0 ? Math.round((visibleTotal / total) * 100) : 0;
-
   return (
-    <main
-      className="flex flex-col items-center justify-start bg-gray-200 p-5 rounded-lg shadow-xl relative mt-6"
-      style={{ width: "590px", height: "335px" }}
-    >
-      {/* Title */}
-      <h2 className="text-2xl font-extrabold text-[#707178] mb-4">
+    <main className="flex flex-col items-center justify-start bg-[#fff] p-5 rounded-lg shadow-xl relative mt-6 border">
+      <h2 className="text-xl font-semibold text-[#707178] mb-6">
         Invoice Statistic
       </h2>
 
-      <div className="flex items-center">
+      <div className="flex items-center mt-8">
         {/* Pie Chart */}
         <div
           className="relative w-52 h-52 rounded-full"
           style={{
-            background: total > 0 ? `conic-gradient(${gradientSegments})` : "gray", // Fallback to gray if total is 0
+            background:
+              visibleTotal > 0 ? `conic-gradient(${gradientSegments})` : "gray",
           }}
         >
-          <div className="absolute inset-4 bg-gray-100 rounded-full"></div>
+          <div className="absolute inset-6 bg-[#fff] rounded-full"></div>
           <div className="absolute inset-0 flex justify-center items-center">
-            <span className="text-lg font-bold text-gray-700">
-              {piePercentage}%
+            <span className="text-lg font-bold text-[#454444]">
+              {visibleTotal} Total
             </span>
           </div>
         </div>
@@ -86,7 +112,7 @@ const InvoiceStatistic = () => {
         {/* Settings Button */}
         <button
           onClick={toggleDropdown}
-          className="absolute top-4 right-4 p-2 text-white bg-gray-700 rounded-full flex items-center justify-center"
+          className="absolute top-4 right-4 p-2 text-white bg-gray-400 rounded-full flex items-center justify-center"
         >
           <LuSettings2 size={20} />
         </button>
@@ -94,35 +120,46 @@ const InvoiceStatistic = () => {
         {/* Dropdown */}
         {isDropdownOpen && (
           <div className="absolute top-12 right-4 bg-white shadow-lg rounded-lg w-48 p-4 text-sm text-gray-700">
-            {data.map((item) => (
-              <div key={item.label} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  checked={visibleItems[item.label]}
-                  onChange={() => handleToggleItem(item.label)}
-                  className="mr-2"
-                />
-                <label>{item.label}</label>
-              </div>
-            ))}
+            {data
+              .filter(
+                (item) =>
+                  ![
+                    "Event",
+                    "HardwareID",
+                    "TimeStamp",
+                    "LASTRECEIVEDTIME",
+                    "SPEED",
+                    "Prediction",
+                  ].includes(item.label)
+              )
+              .map((item) => (
+                <div key={item.label} className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    checked={visibleItems[item.label]}
+                    onChange={() => handleToggleItem(item.label)}
+                    className="mr-2"
+                  />
+                  <label>{item.label}</label>
+                </div>
+              ))}
           </div>
         )}
 
         {/* Legend */}
-        <ul className="mt-0 ml-6 bg-white shadow-lg rounded-lg w-64 p-4 text-sm text-gray-700">
-          {visibleData.map((item) => (
+        <ul className="mt-0 ml-6 bg-[#F9F8F8] shadow-lg rounded-lg w-64 p-4 text-sm text-[#595959]">
+          {adjustedData.map((item) => (
             <li
               key={item.label}
               className="flex justify-between items-center mb-2 last:mb-0"
             >
-              {/* Circle to represent the color */}
               <div
                 className="w-4 h-4 rounded-full"
                 style={{ backgroundColor: item.color }}
               ></div>
               <span>{item.label}</span>
               <span>
-                {item.value} ({Math.round((item.value / total) * 100)}%)
+                {item.value} ({item.adjustedPercentage}%)
               </span>
             </li>
           ))}

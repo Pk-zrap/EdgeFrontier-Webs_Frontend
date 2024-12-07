@@ -19,4 +19,3 @@ const PieChartH = ({ percentage, color, image }) => {
 };
 
 export default PieChartH;
-
